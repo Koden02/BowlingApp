@@ -185,15 +185,18 @@ namespace BowlingApp
                 return pinsKnockedDown;
             }
         }
-        private List<Frame> Frames { get; set; }
+        private List<Frame> Frames { get; set; } = new List<Frame>();
 
         public BowlingGame()
         {
-            this.Frames = new List<Frame>();
-            AddFrame(); // Do an initial AddFrame to add in the first frame of the game.
+            NewGame();
 
         }
-
+        public void NewGame()
+        {
+            this.Frames = new List<Frame>();
+            AddFrame(); // Do an initial AddFrame to add in the first frame of the game.
+        }
         public int TakeTurn(int rollSkill)
         {
             int frameIndex = this.Frames.Count - 1;
