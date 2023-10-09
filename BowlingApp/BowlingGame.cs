@@ -3,188 +3,189 @@ using System.Collections.Generic;
 
 namespace BowlingApp
 {
-    public class Roll
+
+    public class BowlingGame
     {
-        private int PinsKnockedDown { get; set; }
-        private bool RollTaken { get; set; }
-        public Roll()
+        private class Roll
         {
-            PinsKnockedDown = 0; // Default to 0
-            RollTaken = false;
-        }
-
-        public int TakeRoll(int skillRoll, int pinsRemaining, bool secondRoll)
-        {
-            // We are going to just make it simple, divide the 1d20 by 2 and that will be the number of pins knocked down.
-            // We can change this later
-            PinsKnockedDown = Math.Min(pinsRemaining, skillRoll / 2);
-            RollTaken = true;
-
-            return PinsDowned();
-
-        }
-
-        public int PinsDowned()
-        {
-            // Use this to report the number of pins knocked down.
-            if (RollTaken)
+            private int PinsKnockedDown { get; set; }
+            private bool RollTaken { get; set; }
+            public Roll()
             {
-                return PinsKnockedDown;
-            }
-            else { return -1; }
-        }
-
-        public bool WasTaken()
-        {
-            return RollTaken;
-        }
-    }
-
-    public class Frame
-    {
-        public Roll FirstRoll { get; set; }
-        public Roll SecondRoll { get; set; }
-        public bool isSpare { get; set; }
-        public bool isStrike { get; set; }
-        public int PinsRemaining { get; set; }
-        public bool isFinished { get; set; }
-
-        public Frame()
-        {
-            this.FirstRoll = new Roll();
-            this.SecondRoll = new Roll();
-            this.isSpare = false;
-            this.isStrike = false;
-            this.isFinished = false;
-            this.PinsRemaining = 10;
-        }
-
-        public int RollBall(int rollSkill)
-        {
-            int pinsKnockedDown = 0;
-            if (this.FirstRoll.WasTaken())
-            {
-                pinsKnockedDown = this.SecondRoll.TakeRoll(rollSkill, this.PinsRemaining, true);
-
-            }
-            else
-            {
-                pinsKnockedDown = this.FirstRoll.TakeRoll(rollSkill, this.PinsRemaining, false);
+                PinsKnockedDown = 0; // Default to 0
+                RollTaken = false;
             }
 
-            RemovePins(pinsKnockedDown);
-
-            if (this.PinsRemaining == 0 || this.SecondRoll.WasTaken())
+            public int TakeRoll(int skillRoll, int pinsRemaining, bool secondRoll)
             {
-                this.isFinished = true;
-                if (this.SecondRoll.WasTaken() && this.PinsRemaining == 0)
-                    this.isSpare = true;
-                else if (this.FirstRoll.WasTaken() && this.PinsRemaining == 0)
-                    this.isStrike = true;
+                // We are going to just make it simple, divide the 1d20 by 2 and that will be the number of pins knocked down.
+                // We can change this later
+                PinsKnockedDown = Math.Min(pinsRemaining, skillRoll / 2);
+                RollTaken = true;
+
+                return PinsDowned();
+
             }
 
-            return pinsKnockedDown;
-
-        }
-        public void RemovePins(int pinsToRemove)
-        {
-            this.PinsRemaining -= pinsToRemove;
-            if (this.PinsRemaining < 0)
-                this.PinsRemaining = 0; //sanity check
-        }
-
-        public bool isFrameFinished()
-        {
-            return this.isFinished;
-        }
-    }
-
-    public class FinalFrame : Frame
-    {
-        public Roll ThirdRoll { get; set; }
-        public bool isFollowupRoll { get; set; }
-        public bool isSecondStrike { get; set; }
-        public bool isThirdStrike { get; set; }
-        public bool isThirdSpare { get; set; } // In this particular case, you can only get a spare on second or third, so the first is implied.
-        public bool isCleared { get; set; } // This is for if all the pins are knocked down so that the system knows that they were reset previously
-        public FinalFrame() : base()
-        {
-            this.ThirdRoll = new Roll();
-            this.isFollowupRoll = false;
-            this.isSecondStrike = false;
-            this.isThirdStrike = false;
-            this.isThirdSpare = false;
-            this.isCleared = false;
-        }
-
-        public new void RemovePins(int pinsToRemove)
-        {
-            this.PinsRemaining -= pinsToRemove;
-            if (this.PinsRemaining < 0)
-                this.PinsRemaining = 0; // sanity check
-
-            if (this.PinsRemaining == 0)
+            public int PinsDowned()
             {
-                this.PinsRemaining = 10; // on the final frame when it's 0 it will replace the pins.
-                this.isFollowupRoll = false;
-                this.isCleared = true;
-            }
-            else
-            {
-                this.isFollowupRoll = true;
-                this.isCleared = false;  // Redundent but there as a safty, at least for now.
-            }
-        }
-
-        public new int RollBall(int rollSkill)
-        {
-            int pinsKnockedDown = 0;
-            if (this.FirstRoll.WasTaken())
-            {
-                if (this.SecondRoll.WasTaken() && (this.isSpare || this.isStrike))
+                // Use this to report the number of pins knocked down.
+                if (RollTaken)
                 {
-                    pinsKnockedDown = this.ThirdRoll.TakeRoll(rollSkill, this.PinsRemaining, this.isFollowupRoll);
+                    return PinsKnockedDown;
                 }
-                else if (!this.SecondRoll.WasTaken())
-                {
-                    pinsKnockedDown = this.SecondRoll.TakeRoll(rollSkill, this.PinsRemaining, this.isFollowupRoll);
-                }
-
-            }
-            else
-            {
-                pinsKnockedDown = this.FirstRoll.TakeRoll(rollSkill, this.PinsRemaining, false);
+                else { return -1; }
             }
 
-            RemovePins(pinsKnockedDown);
-
-            if (this.isCleared)
+            public bool WasTaken()
             {
-                this.isCleared = false; // Set to false, we don't need this to flag unless it changes again.
-                if (!this.isFollowupRoll)
+                return RollTaken;
+            }
+        }
+
+        private class Frame
+        {
+            public Roll FirstRoll { get; set; }
+            public Roll SecondRoll { get; set; }
+            public bool isSpare { get; set; }
+            public bool isStrike { get; set; }
+            public int PinsRemaining { get; set; }
+            public bool isFinished { get; set; }
+
+            public Frame()
+            {
+                this.FirstRoll = new Roll();
+                this.SecondRoll = new Roll();
+                this.isSpare = false;
+                this.isStrike = false;
+                this.isFinished = false;
+                this.PinsRemaining = 10;
+            }
+
+            public int RollBall(int rollSkill)
+            {
+                int pinsKnockedDown = 0;
+                if (this.FirstRoll.WasTaken())
                 {
-                    if (this.ThirdRoll.WasTaken())
-                        this.isThirdStrike = true;
-                    else if (this.SecondRoll.WasTaken())
-                        this.isSecondStrike = true;
-                    else if (this.FirstRoll.WasTaken())
-                        this.isStrike = true;
+                    pinsKnockedDown = this.SecondRoll.TakeRoll(rollSkill, this.PinsRemaining, true);
+
                 }
                 else
                 {
-                    if (this.ThirdRoll.WasTaken())
-                        this.isThirdSpare = true;
-                    else if (this.SecondRoll.WasTaken())
+                    pinsKnockedDown = this.FirstRoll.TakeRoll(rollSkill, this.PinsRemaining, false);
+                }
+
+                RemovePins(pinsKnockedDown);
+
+                if (this.PinsRemaining == 0 || this.SecondRoll.WasTaken())
+                {
+                    this.isFinished = true;
+                    if (this.SecondRoll.WasTaken() && this.PinsRemaining == 0)
                         this.isSpare = true;
+                    else if (this.FirstRoll.WasTaken() && this.PinsRemaining == 0)
+                        this.isStrike = true;
+                }
+
+                return pinsKnockedDown;
+
+            }
+            public void RemovePins(int pinsToRemove)
+            {
+                this.PinsRemaining -= pinsToRemove;
+                if (this.PinsRemaining < 0)
+                    this.PinsRemaining = 0; //sanity check
+            }
+
+            public bool isFrameFinished()
+            {
+                return this.isFinished;
+            }
+        }
+
+        private class FinalFrame : Frame
+        {
+            public Roll ThirdRoll { get; set; }
+            public bool isFollowupRoll { get; set; }
+            public bool isSecondStrike { get; set; }
+            public bool isThirdStrike { get; set; }
+            public bool isThirdSpare { get; set; } // In this particular case, you can only get a spare on second or third, so the first is implied.
+            public bool isCleared { get; set; } // This is for if all the pins are knocked down so that the system knows that they were reset previously
+            public FinalFrame() : base()
+            {
+                this.ThirdRoll = new Roll();
+                this.isFollowupRoll = false;
+                this.isSecondStrike = false;
+                this.isThirdStrike = false;
+                this.isThirdSpare = false;
+                this.isCleared = false;
+            }
+
+            public new void RemovePins(int pinsToRemove)
+            {
+                this.PinsRemaining -= pinsToRemove;
+                if (this.PinsRemaining < 0)
+                    this.PinsRemaining = 0; // sanity check
+
+                if (this.PinsRemaining == 0)
+                {
+                    this.PinsRemaining = 10; // on the final frame when it's 0 it will replace the pins.
+                    this.isFollowupRoll = false;
+                    this.isCleared = true;
+                }
+                else
+                {
+                    this.isFollowupRoll = true;
+                    this.isCleared = false;  // Redundent but there as a safty, at least for now.
                 }
             }
 
-            return pinsKnockedDown;
+            public new int RollBall(int rollSkill)
+            {
+                int pinsKnockedDown = 0;
+                if (this.FirstRoll.WasTaken())
+                {
+                    if (this.SecondRoll.WasTaken() && (this.isSpare || this.isStrike))
+                    {
+                        pinsKnockedDown = this.ThirdRoll.TakeRoll(rollSkill, this.PinsRemaining, this.isFollowupRoll);
+                    }
+                    else if (!this.SecondRoll.WasTaken())
+                    {
+                        pinsKnockedDown = this.SecondRoll.TakeRoll(rollSkill, this.PinsRemaining, this.isFollowupRoll);
+                    }
+
+                }
+                else
+                {
+                    pinsKnockedDown = this.FirstRoll.TakeRoll(rollSkill, this.PinsRemaining, false);
+                }
+
+                RemovePins(pinsKnockedDown);
+
+                if (this.isCleared)
+                {
+                    this.isCleared = false; // Set to false, we don't need this to flag unless it changes again.
+                    if (!this.isFollowupRoll)
+                    {
+                        if (this.ThirdRoll.WasTaken())
+                            this.isThirdStrike = true;
+                        else if (this.SecondRoll.WasTaken())
+                            this.isSecondStrike = true;
+                        else if (this.FirstRoll.WasTaken())
+                            this.isStrike = true;
+                    }
+                    else
+                    {
+                        if (this.ThirdRoll.WasTaken())
+                            this.isThirdSpare = true;
+                        else if (this.SecondRoll.WasTaken())
+                            this.isSpare = true;
+                    }
+                }
+
+                return pinsKnockedDown;
+            }
         }
-    }
-    public class BowlingGame
-    {
-        public List<Frame> Frames { get; set; }
+        private List<Frame> Frames { get; set; }
 
         public BowlingGame()
         {
