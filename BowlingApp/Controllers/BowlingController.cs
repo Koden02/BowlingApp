@@ -1,11 +1,19 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using BowlingApp;
 
-namespace BowlingGame.Controllers
+namespace BowlingApp.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class BowlingController : ControllerBase
     {
+        private BowlingGame _bowlingGame;
+
+        public BowlingController()
+        {
+            _bowlingGame = new BowlingGame();
+        }
+
         [HttpPost("calculateScore")]
         public IActionResult CalculateScore([FromBody] int rollNumber)
         {
@@ -24,17 +32,17 @@ namespace BowlingGame.Controllers
 
         private int CalculatePinsKnockedDown(int randomNumber)
         {
-            // Implement your logic to calculate the number of pins knocked down
-            // For example, you can have a switch statement to handle different random number cases
-            // and return the corresponding number of pins knocked down based on your game rules.
-            // Replace this with your actual game logic.
-            return randomNumber; // Placeholder logic, replace with actual calculation
+            return _bowlingGame.TakeTurn(randomNumber);
         }
 
-        private void NewGame()
+        [HttpPost("newGame")]
+        public IActionResult NewGame()
         {
             // Reset the game to start from scratch.
+            _bowlingGame.NewGame();
 
+            return Ok(new { message = "New Game Started."});
         }
+
     }
 }
