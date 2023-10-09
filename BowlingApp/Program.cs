@@ -7,7 +7,8 @@ builder.Services.AddCors(options =>
         policy => {
             policy.WithOrigins("https://localhost:44408",
                 "https://localhost:7156")
-            .WithHeaders(HeaderNames.ContentType, "application/json")
+            .AllowAnyHeader()
+            //.WithHeaders(HeaderNames.ContentType, "application/json")
             .AllowAnyMethod()
             .AllowCredentials();
             });

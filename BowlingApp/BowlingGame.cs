@@ -62,7 +62,7 @@ namespace BowlingApp
                 this.PinsRemaining = 10;
             }
 
-            public int RollBall(int rollSkill)
+            public virtual int RollBall(int rollSkill)
             {
                 int pinsKnockedDown = 0;
                 if (this.FirstRoll.WasTaken())
@@ -89,7 +89,7 @@ namespace BowlingApp
                 return pinsKnockedDown;
 
             }
-            public void RemovePins(int pinsToRemove)
+            public virtual void RemovePins(int pinsToRemove)
             {
                 this.PinsRemaining -= pinsToRemove;
                 if (this.PinsRemaining < 0)
@@ -120,7 +120,7 @@ namespace BowlingApp
                 this.isCleared = false;
             }
 
-            public new void RemovePins(int pinsToRemove)
+            public override void RemovePins(int pinsToRemove)
             {
                 this.PinsRemaining -= pinsToRemove;
                 if (this.PinsRemaining < 0)
@@ -132,14 +132,18 @@ namespace BowlingApp
                     this.isFollowupRoll = false;
                     this.isCleared = true;
                 }
-                else
+                else if (this.isFollowupRoll)
+                {
+                    this.isFinished = true;
+                }
+                else 
                 {
                     this.isFollowupRoll = true;
                     this.isCleared = false;  // Redundent but there as a safty, at least for now.
                 }
             }
 
-            public new int RollBall(int rollSkill)
+            public override int RollBall(int rollSkill)
             {
                 int pinsKnockedDown = 0;
                 if (this.FirstRoll.WasTaken())
