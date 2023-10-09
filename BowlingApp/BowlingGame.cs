@@ -181,51 +181,51 @@ namespace BowlingApp
 
             return pinsKnockedDown;
         }
+    }
+    public class BowlingGame
+    {
+        public List<Frame> Frames { get; set; }
 
-        public class BowlingGame
+        public BowlingGame()
         {
-            public List<Frame> Frames { get; set; }
+            this.Frames = new List<Frame>();
+            AddFrame(); // Do an initial AddFrame to add in the first frame of the game.
 
-            public BowlingGame()
+        }
+
+        public int TakeTurn(int rollSkill)
+        {
+            int frameIndex = this.Frames.Count - 1;
+            int PinsDowned = this.Frames[frameIndex].RollBall(rollSkill);
+
+            if (this.Frames[frameIndex].isFinished)
             {
-                this.Frames = new List<Frame>();
-                AddFrame(); // Do an initial AddFrame to add in the first frame of the game.
-
+                AddFrame();
             }
 
-            public int TakeTurn(int rollSkill)
+            return PinsDowned;
+        }
+
+        private bool AddFrame()
+        {
+            int frameCount = this.Frames.Count;
+            if (frameCount >= 10)
             {
-                int frameIndex = this.Frames.Count - 1;
-                int PinsDowned = this.Frames[frameIndex].RollBall(rollSkill);
-
-                if (this.Frames[frameIndex].isFinished)
-                {
-                    AddFrame();
-                }
-
-                return PinsDowned;
+                // A game of bowling shouldn't be more than 10 frames, don't do anything.
+                return false;
+            }
+            else if (frameCount < 9)
+            {
+                Frames.Add(new Frame());
+            }
+            else if (frameCount == 9)
+            {
+                Frames.Add(new FinalFrame());
             }
 
-            private bool AddFrame()
-            {
-                int frameCount = this.Frames.Count;
-                if (frameCount >= 10)
-                {
-                    // A game of bowling shouldn't be more than 10 frames, don't do anything.
-                    return false;
-                }
-                else if (frameCount < 9)
-                {
-                    Frames.Add(new Frame());
-                }
-                else if (frameCount == 9)
-                {
-                    Frames.Add(new FinalFrame());
-                }
+            return true;
 
-                return true;
-
-            }
         }
     }
 }
+
