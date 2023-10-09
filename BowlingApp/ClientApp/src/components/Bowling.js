@@ -1,5 +1,8 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
+
+const axiosInstance = axios.create({ baseURL : 'http://localhost:5071' });
+
 
 const BowlingGame = () => {
     const [diceRollResult, setDiceRollResult] = useState(0);
@@ -10,7 +13,7 @@ const BowlingGame = () => {
         setDiceRollResult(randomNumber);
 
         // Take this random rolled number and send it to the API for it to decide what the result is.
-        axios.post('/api/bowling/calculateScore', { rollNumber: randomNumber })
+        axios.post('http://localhost:5071/api/bowling/calculateScore', { rollNumber: randomNumber }, { headers: { 'Content-Type': 'application/json' }, withCredentials: true})
             .then(response => {
                 // Handle the response and update the UI here with the result
                 const pinsDowned = response.data.pinsKnockedDown;
@@ -25,7 +28,7 @@ const BowlingGame = () => {
 
     const startNewGame = () => {
         // Send a request to start a new game
-        axios.post('/api/bowling/newGame')
+        axios.get('http://localhost:5071/api/bowling/newGame')
             .then(response => {
                 // Handle the response and update the UI
                 console.log(response.data.message); // Log the server response

@@ -35,7 +35,7 @@ namespace BowlingApp.Controllers
             return _bowlingGame.TakeTurn(randomNumber);
         }
 
-        [HttpPost("newGame")]
+        [HttpGet("newGame")]
         public IActionResult NewGame()
         {
             // Reset the game to start from scratch.
