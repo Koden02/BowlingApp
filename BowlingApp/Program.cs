@@ -1,7 +1,19 @@
+using Microsoft.Net.Http.Headers;
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(
+        policy => {
+            policy.WithOrigins("https://localhost:44408",
+                "https://localhost:7156")
+            .WithHeaders(HeaderNames.ContentType, "application/json")
+            .AllowAnyMethod()
+            .AllowCredentials();
+            });
+});
 
+// Add services to the container.
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
@@ -23,5 +35,8 @@ app.MapControllerRoute(
     pattern: "{controller}/{action=Index}/{id?}");
 
 app.MapFallbackToFile("index.html"); ;
+
+app.UseCors();
+app.UseAuthorization();
 
 app.Run();

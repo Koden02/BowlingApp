@@ -1,5 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using BowlingApp;
+using Microsoft.AspNetCore.Cors;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using Newtonsoft.Json.Linq;
 
 namespace BowlingApp.Controllers
 {
@@ -7,20 +11,24 @@ namespace BowlingApp.Controllers
     [ApiController]
     public class BowlingController : ControllerBase
     {
-        private BowlingGame _bowlingGame;
+        private static BowlingGame _bowlingGame = new BowlingGame();
 
         public BowlingController()
         {
-            _bowlingGame = new BowlingGame();
         }
 
         [HttpPost("calculateScore")]
-        public IActionResult CalculateScore([FromBody] int rollNumber)
+        public IActionResult CalculateScore([FromBody] JsonElement body)
         {
+            string json = System.Text.Json.JsonSerializer.Serialize(body);
+            JObject jo = JObject.Parse(json);
+            JToken jToken = jo["rollNumber"];
+            int rollNumber = (int)jToken;
             // Sanity check the values
-            int validRoll = 0;
+            int validRoll;
             if (rollNumber < 1) { validRoll = 1; }
-            else if (rollNumber > 20) {  validRoll = 20; }
+            else if (rollNumber > 20) { validRoll = 20; }
+            else validRoll = rollNumber;
 
             // Calculate the number of pins knocked down based on the random number
             // Implement your game logic here

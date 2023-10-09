@@ -1,7 +1,4 @@
 import React, { useState } from 'react';
-import axios from 'axios';
-
-const axiosInstance = axios.create({ baseURL : 'http://localhost:5071' });
 
 
 const BowlingGame = () => {
@@ -11,27 +8,57 @@ const BowlingGame = () => {
     const rollDice = () => {
         const randomNumber = Math.floor(Math.random() * 20) + 1;
         setDiceRollResult(randomNumber);
+        const jsonString = JSON.stringify({ rollNumber: randomNumber });
 
         // Take this random rolled number and send it to the API for it to decide what the result is.
-        axios.post('http://localhost:5071/api/bowling/calculateScore', { rollNumber: randomNumber }, { headers: { 'Content-Type': 'application/json' }, withCredentials: true})
+        fetch('https://localhost:7156/api/bowling/calculateScore', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            mode: 'cors',
+            cache: 'no-cache',
+            credentials: 'same-origin',
+            body: jsonString,
+            //credentials: 'include', // Use 'include' to send credentials (cookies, etc.) with the request
+        })
             .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
                 // Handle the response and update the UI here with the result
-                const pinsDowned = response.data.pinsKnockedDown;
+                const pinsDowned = data.pinsKnockedDown;
                 setPinsKnockedDown(pinsDowned);
                 // Update the UI
             })
             .catch(error => {
                 // Handle/display errors
-                console.error('Error: ', error);
+                console.error('Error:', error);
             });
     };
 
+
     const startNewGame = () => {
         // Send a request to start a new game
-        axios.get('http://localhost:5071/api/bowling/newGame')
+        fetch('https://localhost:7156/api/bowling/newGame', {
+            method: 'GET',
+            headers: {
+                accept: 'application/json'
+            }
+            //credentials: 'include', // Use 'include' to send credentials (cookies, etc.) with the request
+        })
             .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
                 // Handle the response and update the UI
-                console.log(response.data.message); // Log the server response
+                console.log(data.message); // Log the server response
             })
             .catch(error => {
                 // Handle/display errors
