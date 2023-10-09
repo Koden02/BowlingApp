@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace BowlingApp.ClientApp
+namespace BowlingApp
 {
     public class Roll
     {
         private int PinsKnockedDown { get; set; }
         private bool RollTaken { get; set; }
-        public Roll() 
+        public Roll()
         {
             PinsKnockedDown = 0; // Default to 0
             RollTaken = false;
@@ -17,9 +17,9 @@ namespace BowlingApp.ClientApp
         {
             // We are going to just make it simple, divide the 1d20 by 2 and that will be the number of pins knocked down.
             // We can change this later
-            PinsKnockedDown = Math.Min(pinsRemaining, skillRoll / 2)
+            PinsKnockedDown = Math.Min(pinsRemaining, skillRoll / 2);
             RollTaken = true;
-            
+
             return PinsDowned();
 
         }
@@ -35,8 +35,8 @@ namespace BowlingApp.ClientApp
         }
 
         public bool WasTaken()
-        { 
-            return RollTaken; 
+        {
+            return RollTaken;
         }
     }
 
@@ -61,15 +61,15 @@ namespace BowlingApp.ClientApp
 
         public int RollBall(int rollSkill)
         {
-            int pinsKnockedDown = 0
+            int pinsKnockedDown = 0;
             if (this.FirstRoll.WasTaken())
             {
-                pinsKnockedDown = this.SecondRoll.TakeRoll(rollSkill, this.PensRemaining, true);
-             
+                pinsKnockedDown = this.SecondRoll.TakeRoll(rollSkill, this.PinsRemaining, true);
+
             }
             else
             {
-                pinsKnockedDown = this.FirstRoll.TakeRoll(rollSkill, this.PensRemaining, false);
+                pinsKnockedDown = this.FirstRoll.TakeRoll(rollSkill, this.PinsRemaining, false);
             }
 
             RemovePins(pinsKnockedDown);
@@ -86,7 +86,7 @@ namespace BowlingApp.ClientApp
             return pinsKnockedDown;
 
         }
-        public RemovePins(int pinsToRemove)
+        public void RemovePins(int pinsToRemove)
         {
             this.PinsRemaining -= pinsToRemove;
             if (this.PinsRemaining < 0)
@@ -117,7 +117,7 @@ namespace BowlingApp.ClientApp
             this.isCleared = false;
         }
 
-        public RemovePins(int pinsToRemove)
+        public new void RemovePins(int pinsToRemove)
         {
             this.PinsRemaining -= pinsToRemove;
             if (this.PinsRemaining < 0)
@@ -136,24 +136,24 @@ namespace BowlingApp.ClientApp
             }
         }
 
-        public int RollBall(int rollSkill)
+        public new int RollBall(int rollSkill)
         {
-            int pinsKnockedDown = 0
+            int pinsKnockedDown = 0;
             if (this.FirstRoll.WasTaken())
             {
                 if (this.SecondRoll.WasTaken() && (this.isSpare || this.isStrike))
                 {
-                    pinsKnockedDown = this.ThirdRoll.TakeRoll(rollSkill, this.PensRemaining, this.isFollowupRoll);
+                    pinsKnockedDown = this.ThirdRoll.TakeRoll(rollSkill, this.PinsRemaining, this.isFollowupRoll);
                 }
                 else if (!this.SecondRoll.WasTaken())
                 {
-                    pinsKnockedDown = this.SecondRoll.TakeRoll(rollSkill, this.PensRemaining, this.isFollowupRoll);
+                    pinsKnockedDown = this.SecondRoll.TakeRoll(rollSkill, this.PinsRemaining, this.isFollowupRoll);
                 }
 
             }
             else
             {
-                pinsKnockedDown = this.FirstRoll.TakeRoll(rollSkill, this.PensRemaining, false);
+                pinsKnockedDown = this.FirstRoll.TakeRoll(rollSkill, this.PinsRemaining, false);
             }
 
             RemovePins(pinsKnockedDown);
@@ -182,50 +182,50 @@ namespace BowlingApp.ClientApp
             return pinsKnockedDown;
         }
 
-    public class BowlingGame
-    {
-        public List<Frame> Frames { get; set; }
-
-        public BowlingGame()
+        public class BowlingGame
         {
-            this.Frames = new List<Frame>();
-            AddFrame(); // Do an initial AddFrame to add in the first frame of the game.
+            public List<Frame> Frames { get; set; }
 
-        }
-
-        public int TakeTurn(int rollSkill)
-        {
-            int frameIndex = this.Frames.Count -1;
-            int PinsDowned = this.Frames[frameIndex].RollBall(rollSkill);
-
-            if (this.Frames[frameIndex].isFinished)
+            public BowlingGame()
             {
+                this.Frames = new List<Frame>();
+                AddFrame(); // Do an initial AddFrame to add in the first frame of the game.
+
+            }
+
+            public int TakeTurn(int rollSkill)
+            {
+                int frameIndex = this.Frames.Count - 1;
+                int PinsDowned = this.Frames[frameIndex].RollBall(rollSkill);
+
+                if (this.Frames[frameIndex].isFinished)
+                {
                     AddFrame();
+                }
+
+                return PinsDowned;
             }
 
-            return PinsDowned;
-        }
-
-        private bool AddFrame()
-        {
-            int frameCount = this.Frames.Count;
-            bool finalFrame = false;
-            if (frameCount >= 10)
+            private bool AddFrame()
             {
-                // A game of bowling shouldn't be more than 10 frames, don't do anything.
-                return false;
-            }
-            else if (frameCount < 9)
-            {
-                Frames.Add(new Frame())
-            }
-            else if (frameCount == 9)
-            {
-                Frames.Add(new FinalFrame())
-            }
+                int frameCount = this.Frames.Count;
+                if (frameCount >= 10)
+                {
+                    // A game of bowling shouldn't be more than 10 frames, don't do anything.
+                    return false;
+                }
+                else if (frameCount < 9)
+                {
+                    Frames.Add(new Frame());
+                }
+                else if (frameCount == 9)
+                {
+                    Frames.Add(new FinalFrame());
+                }
 
-            return true;
+                return true;
 
+            }
         }
     }
 }
