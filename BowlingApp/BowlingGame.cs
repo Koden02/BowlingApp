@@ -273,7 +273,7 @@ namespace BowlingApp
 
         }
 
-        public string scoreJson()
+        public string styleScoreJson()
         {
             List<FrameData> frameData = new List<FrameData>();
             int count = 0;
@@ -411,7 +411,7 @@ namespace BowlingApp
             return scoreList;
         }
 
-        public string styleScoreJson()
+        public string scoreJson()
         {
             List<FrameData> frameData = new List<FrameData>();
             int count = 0;

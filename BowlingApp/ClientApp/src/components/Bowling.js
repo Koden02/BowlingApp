@@ -23,7 +23,11 @@ const BowlingGame = () => {
     ]); // These are different and will have the stylized outputs
 
     const handleOverrideChange = (event) => {
-        setOverrideNumber(event.target.value);
+        const inputValue = event.target.value;
+        // Ensure the input value is between 0 and 10
+        if (inputValue === '' || (parseInt(inputValue) >= 0 && parseInt(inputValue) <= 10)){
+            setOverrideNumber(inputValue);
+        }
     };
 
     const toggleOverride = () => {
@@ -244,6 +248,7 @@ const BowlingGame = () => {
                         value={overrideNumber}
                         onChange={handleOverrideChange}
                         disabled={!isOverrideEnabled}
+                        placeholder="Enter value (0-10)"
                     />
                 </label>
                 <button onClick={toggleOverride}>
