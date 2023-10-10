@@ -9,6 +9,12 @@ const BowlingGame = () => {
         { id: 1, frame: 1, roll1: '', roll2: '', roll3: '' },
     ]);
 
+    const [scoreSheetData, setScoreSheetData] = useState([
+        { frame: 1, roll1: 'X', roll2: '-', score: '20' },
+        { frame: 2, roll1: '9', roll2: '/', score: '44' },
+        // Add more frames as needed
+    ]);
+
     const [totalScore, setTotalScore] = useState(0);
 
     const fetchScoreTable = () => {
@@ -147,13 +153,13 @@ const BowlingGame = () => {
     return (
         <div className="table-container">
             <h1>Bowling App</h1>
-            <p><button onClick={startNewGame}>Start New Game</button></p>
+            <p><button className="button-56" onClick={startNewGame}>Start New Game</button></p>
             <p></p>
-            <button onClick={rollDice}>Roll the ball!</button>
+            <p><button className="button-56" onClick={rollDice}>Roll the ball!</button></p>
             <p></p>
-            {diceRollResult === -1 && <h2>Game Over!</h2>}
+            {pinsKnockedDown === -1 && <h2>Game Over!</h2>}
             {diceRollResult > 0 && <p>Dice Roll Result: {diceRollResult}</p>}
-            {pinsKnockedDown !== null && <p>Pins Knocked Down: {pinsKnockedDown}</p>}
+            {pinsKnockedDown !== null && pinsKnockedDown !== -1 && <p>Pins Knocked Down: {pinsKnockedDown}</p>}
             {/* Everything else goes here or above */}
             <p></p>
             <p>Score:</p>
@@ -179,6 +185,18 @@ const BowlingGame = () => {
                 </tbody>
             </table>
             <p>Total Score: {totalScore}</p>
+            <p></p>
+            <p></p>
+            {/* Bowling score sheet */}
+            <div className="score-sheet">
+                {scoreSheetData.map((frame, index) => (
+                    <div key={index} className="frame">
+                        <div className="roll">{frame.roll1}</div>
+                        <div className="roll">{frame.roll2}</div>
+                        <div className="score">{frame.score}</div>
+                    </div>
+                ))}
+            </div>
         </div>
     );
 };

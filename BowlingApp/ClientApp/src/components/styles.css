@@ -6,6 +6,11 @@
 .custom-table {
     width: 100%;
     border-collapse: collapse;
+    background-color: #f1f1ff;
+    font-size: 16px;
+    font-style: oblique;
+    font-weight: bold;
+    color: #0000ff;
 }
 
     .custom-table th, .custom-table td {
@@ -15,9 +20,131 @@
     }
 
     .custom-table th {
-        background-color: #f2f2f2; /* Background color for header cells */
+        background-color: #4e4eff; /* Background color for header cells */
+        color: #cacaff;
     }
 
     .custom-table tr:nth-child(even) {
-        background-color: #f2f2f2; /* Alternate row background color */
+        background-color: #cacaff; /* Alternate row background color */
     }
+
+.button-primary {
+    background-color: #0000ff;
+    border: #8989ff;
+    color: #f1f1ff;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 8px;
+}
+.button-secondary {
+    background-color: #cacaff;
+    border: #8989ff;
+    color: #0000ff;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 8px;
+}
+
+.button-56 {
+    align-items: center;
+    background-color: #0000ff;
+    border: 2px solid #8989ff;
+    border-radius: 8px;
+    box-sizing: border-box;
+    color: #f1f1ff;
+    cursor: pointer;
+    display: flex;
+    font-family: Inter,sans-serif;
+    font-size: 16px;
+    height: 48px;
+    justify-content: center;
+    line-height: 24px;
+    max-width: 100%;
+    padding: 0 25px;
+    position: relative;
+    text-align: center;
+    text-decoration: none;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+}
+
+    .button-56:after {
+        background-color: #4e4eff;
+        border-radius: 8px;
+        content: "";
+        display: block;
+        height: 48px;
+        left: 0;
+        width: 100%;
+        position: absolute;
+        top: -2px;
+        transform: translate(8px, 8px);
+        transition: transform .2s ease-out;
+        z-index: -1;
+    }
+
+.button-56:hover:after {
+    transform: translate(0, 0);
+}
+
+.button-56:active {
+    background-color: #ffdeda;
+    outline: 0;
+}
+
+.button-56:hover {
+    outline: 0;
+}
+
+@media (min-width: 768px) {
+    .button-56 {
+        padding: 0 40px;
+    }
+}
+
+.score-sheet {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    flex-direction: column;
+}
+
+.frame {
+    display: flex; /* Use flex container */
+    justify-content: space-between; /* Space the rolls horizontally */
+    align-items: center;
+    margin: 0 10px;
+    border: 1px solid #000;
+    width: 100px; /* Adjust the width if needed */
+    height: 60px;
+    font-size: 18px;
+}
+
+.rolls {
+    display: flex; /* Use flex container for rolls */
+}
+
+.roll {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.score {
+    margin-top: 10px;
+    font-size: 24px; /* Larger font size for total score */
+    font-weight: bold;
+}
