@@ -6,12 +6,30 @@ const BowlingGame = () => {
     const [pinsKnockedDown, setPinsKnockedDown] = useState(null);
 
     const [tableData, setTableData] = useState([
-        { id: 1, frame: 1, roll1: '', roll2: '', roll3: '' },
+        { frame: 1, roll1: '', roll2: '', roll3: ''},
     ]);
 
     const [calculateTotalScoreList, setCalculateTotalScoreList] = useState([])
 
     const [totalScore, setTotalScore] = useState(0);
+
+    const [overrideNumber, setOverrideNumber] = useState('');
+    const [isOverrideEnabled, setIsOverrideEnabled] = useState(false);
+
+    const [styleTableData, setStyleTableData] = useState([
+        { frame:1, roll1: '', roll2: '', roll3: ''
+
+        }
+    ]); // These are different and will have the stylized outputs
+
+    const handleOverrideChange = (event) => {
+        setOverrideNumber(event.target.value);
+    };
+
+    const toggleOverride = () => {
+        setIsOverrideEnabled(!isOverrideEnabled);
+    };
+
 
     const fetchScoreTable = () => {
         fetch('https://localhost:7156/api/bowling/getScoreTable', {
@@ -31,7 +49,7 @@ const BowlingGame = () => {
                 console.log(scoreTableData); // Log the server response
                 // Update your UI or state with scoreTableData
 
-                var array = JSON.parse(scoreTableData);
+                let array = JSON.parse(scoreTableData);
 
                 if (Array.isArray(array)) {
                     setTableData(array);
@@ -45,8 +63,45 @@ const BowlingGame = () => {
             });
     };
 
+    const fetchStyleScoreTable = () => {
+        fetch('https://localhost:7156/api/bowling/getStyleScoreTable', {
+            method: 'GET',
+            headers: {
+                accept: 'application/json'
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(styleScoreTableData => {
+                // Handle the response and update the UI with the score table data
+                console.log(styleScoreTableData); // Log the server response
+                // Update your UI or state with scoreTableData
+
+                let array = JSON.parse(styleScoreTableData);
+
+                if (Array.isArray(array)) {
+                    setStyleTableData(array);
+                } else {
+                    console.error('Invalid data format received:', styleScoreTableData);
+                }
+            })
+            .catch(error => {
+                // Handle/display errors for getScoreTable endpoint
+                console.error('Error:', error);
+            });
+    };
+
+
     const rollDice = () => {
-        const randomNumber = Math.floor(Math.random() * 20) + 1;
+        let randomNumber = Math.floor(Math.random() * 11);
+        if (isOverrideEnabled && overrideNumber !== '') {
+            // Use the override number if override mode is enabled and a valid number is provided
+            randomNumber = parseInt(overrideNumber);
+        }
         setDiceRollResult(randomNumber);
         const jsonString = JSON.stringify({ rollNumber: randomNumber });
 
@@ -78,6 +133,7 @@ const BowlingGame = () => {
                 fetchScoreTable();
                 fetchTotalScore();
                 fetchScoreList();
+                fetchStyleScoreTable();
 
 
             })
@@ -107,6 +163,8 @@ const BowlingGame = () => {
                 console.log(data.message); // Log the server response
                 fetchScoreTable();
                 fetchTotalScore();
+                fetchScoreList();
+                fetchStyleScoreTable();
                 setDiceRollResult(0);
                 setPinsKnockedDown(null);
             })
@@ -169,6 +227,7 @@ const BowlingGame = () => {
         fetchScoreTable();
         fetchTotalScore();
         fetchScoreList();
+        fetchStyleScoreTable();
     }, []); // Empty dependency array ensures this effect runs once after the initial render
 
 
@@ -176,12 +235,26 @@ const BowlingGame = () => {
         <div className="table-container">
             <h1>Bowling App</h1>
             <p><button className="button-56" onClick={startNewGame}>Start New Game</button></p>
-            <p></p>
             <p><button className="button-56" onClick={rollDice}>Roll the ball!</button></p>
+            <div className="override-container">
+                <label>
+                    Override Number:
+                    <input
+                        type="number"
+                        value={overrideNumber}
+                        onChange={handleOverrideChange}
+                        disabled={!isOverrideEnabled}
+                    />
+                </label>
+                <button onClick={toggleOverride}>
+                    {isOverrideEnabled ? 'Disable Override' : 'Enable Override'}
+                </button>
+            </div>
             <p></p>
-            {pinsKnockedDown === -1 && <h2>Game Over!</h2>}
+            <p></p>
+            {pinsKnockedDown == -1 && <h2>Game Over!</h2>}
             {diceRollResult > 0 && <p>Dice Roll Result: {diceRollResult}</p>}
-            {pinsKnockedDown !== null && pinsKnockedDown !== -1 && <p>Pins Knocked Down: {pinsKnockedDown}</p>}
+            {pinsKnockedDown != null && pinsKnockedDown != -1 && <p>Pins Knocked Down: {pinsKnockedDown}</p>}
             {/* Everything else goes here or above */}
             <p></p>
             <p></p>
@@ -198,7 +271,7 @@ const BowlingGame = () => {
                 </thead>
                 <tbody>
                     {tableData.map((row) => (
-                        <tr key={row.id}>
+                        <tr key={row.frame}>
                             <td>{row.frame}</td>
                             <td>{row.roll1}</td>
                             <td>{row.roll2}</td>
@@ -212,13 +285,13 @@ const BowlingGame = () => {
             <p></p>
             {/* Bowling score sheet */}
             <div className="score-sheet">
-                {tableData.map((frame, index) => (
-                    <div key={frame.id} className="frame">
+                {styleTableData.map((frame, index) => (
+                    <div key={frame.frame} className="frame">
                         <div className="frame-number">{frame.frame}</div>
                         <div className="rolls">
                             <div className="roll">{frame.roll1}</div>
                             <div className="roll">{frame.roll2}</div>
-                            {frame.roll3 !== "" && <div className="roll">{frame.roll3}</div> }
+                            {frame.roll3 != "" && <div className="roll">{frame.roll3}</div> }
                         </div>
                         <div className="score">{calculateTotalScoreList[index]}</div>
                     </div>
