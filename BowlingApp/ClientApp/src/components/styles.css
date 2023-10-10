@@ -1,0 +1,23 @@
+﻿/* CSS (styles.css) */
+.table-container {
+    margin: 20px;
+}
+
+.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+    .custom-table th, .custom-table td {
+        border: 1px solid #ccc; /* Add border around cells */
+        padding: 10px; /* Add padding inside cells */
+        text-align: center; /* Center text within cells */
+    }
+
+    .custom-table th {
+        background-color: #f2f2f2; /* Background color for header cells */
+    }
+
+    .custom-table tr:nth-child(even) {
+        background-color: #f2f2f2; /* Alternate row background color */
+    }
