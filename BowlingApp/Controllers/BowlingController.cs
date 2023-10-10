@@ -30,8 +30,8 @@ namespace BowlingApp.Controllers
             int rollNumber = (int)jToken;
             // Sanity check the values
             int validRoll;
-            if (rollNumber < 1) { validRoll = 1; }
-            else if (rollNumber > 20) { validRoll = 20; }
+            if (rollNumber < 0) { validRoll = 0; }
+            else if (rollNumber > 10) { validRoll = 10; }
             else validRoll = rollNumber;
 
             // Calculate the number of pins knocked down based on the random number
@@ -60,6 +60,12 @@ namespace BowlingApp.Controllers
         public IActionResult getScoreTable()
         {
             return Ok(_bowlingGame.scoreJson().ToLower());
+        }
+
+        [HttpGet("getStyleScoreTable")]
+        public IActionResult getStyleScoreTable()
+        {
+            return Ok(_bowlingGame.styleScoreJson().ToLower());
         }
 
         [HttpGet("getTotalScore")]

@@ -20,9 +20,9 @@ namespace BowlingApp
 
             public int TakeRoll(int skillRoll, int pinsRemaining)
             {
-                // We are going to just make it simple, divide the 1d20 by 2 and that will be the number of pins knocked down.
+                // We are going to just make it simple, 1d11 - 1 and that number is the number of pens dropped.
                 // We can change this later
-                PinsKnockedDown = Math.Min(pinsRemaining, skillRoll / 2);
+                PinsKnockedDown = Math.Min(pinsRemaining, skillRoll);
                 RollTaken = true;
 
                 return PinsDowned();
@@ -116,7 +116,7 @@ namespace BowlingApp
             public bool isFollowupRoll { get; set; }
             public bool isSecondStrike { get; set; }
             public bool isThirdStrike { get; set; }
-            public bool isThirdSpare { get; set; } // In this particular case, you can only get a spare on second or third, so the first is implied.
+            public bool isSecondSpare { get; set; } // In this particular case, you can only get a spare on second or third, so the first is implied.
             public bool isCleared { get; set; } // This is for if all the pins are knocked down so that the system knows that they were reset previously
             public FinalFrame() : base()
             {
@@ -124,7 +124,7 @@ namespace BowlingApp
                 this.isFollowupRoll = false;
                 this.isSecondStrike = false;
                 this.isThirdStrike = false;
-                this.isThirdSpare = false;
+                this.isSecondSpare = false;
                 this.isCleared = false;
             }
 
@@ -137,7 +137,7 @@ namespace BowlingApp
                 if (this.PinsRemaining == 0)
                 {
                     this.PinsRemaining = 10; // on the final frame when it's 0 it will replace the pins.
-                    this.isFollowupRoll = false;
+                    //this.isFollowupRoll = false;
                     this.isCleared = true;
                 }
                 else if (this.isFollowupRoll)
@@ -188,16 +188,25 @@ namespace BowlingApp
                         if (this.ThirdRoll.WasTaken())
                             this.isThirdStrike = true;
                         else if (this.SecondRoll.WasTaken())
+                        {
                             this.isSecondStrike = true;
+                            this.isFollowupRoll = false;
+                        }
                         else if (this.FirstRoll.WasTaken())
+                        {
                             this.isStrike = true;
+                            this.isFollowupRoll = false;
+                        }
                     }
                     else
                     {
                         if (this.ThirdRoll.WasTaken())
-                            this.isThirdSpare = true;
+                            this.isSecondSpare = true;
                         else if (this.SecondRoll.WasTaken())
+                        {
                             this.isSpare = true;
+                            this.isFollowupRoll= false;
+                        }
                     }
                 }
 
@@ -206,7 +215,6 @@ namespace BowlingApp
         }
         private class FrameData
         {
-            public int Id { get; set; }
             public int Frame { get; set; }
             public string? Roll1 { get; set; }
             public string? Roll2 { get; set; }
@@ -265,7 +273,7 @@ namespace BowlingApp
 
         }
 
-        public string scoreJson()
+        public string styleScoreJson()
         {
             List<FrameData> frameData = new List<FrameData>();
             int count = 0;
@@ -275,6 +283,7 @@ namespace BowlingApp
                 string roll1 = "";
                 string roll2 = "";
                 string roll3 = "";
+                bool final = false;
 
                 if (frame.FirstRoll.PinsDowned() != -1)
                 {
@@ -284,19 +293,49 @@ namespace BowlingApp
                 {
                     roll2 = frame.SecondRoll.PinsDowned().ToString();
                 }
-                if (frame is FinalFrame finalFrame && finalFrame.ThirdRoll.PinsDowned() != -1)
+                if (frame is FinalFrame finalFrame)
                 {
-                    roll3 = finalFrame.ThirdRoll.PinsDowned().ToString();
+                    final = true;
+
+                    if (finalFrame.ThirdRoll.PinsDowned() != -1)
+                    {
+                        roll3 = finalFrame.ThirdRoll.PinsDowned().ToString();
+                    }
                 }
 
+                if (roll1 == "10")
+                {
+                    roll1 = "X";
+                    if(!final) 
+                        roll2 = "";
+                }
+                if (frame.isSpare)
+                {
+                    roll2 = "/";
+                }
+                if (final)
+                {
+                    if (roll2 == "10")
+                    {
+                        roll2 = "X";
+                    }
+                    if (frame is FinalFrame finalFrame2 && finalFrame2.isSecondSpare)
+                    {
+                        roll3 = "/";
+                    }
+                    else if (roll3 == "10")
+                    {
+                        roll3 = "X";
+                    }
+                }
                 frameData.Add(new FrameData
                 {
-                    Id = count,
                     Frame = count,
                     Roll1 = roll1,
                     Roll2 = roll2,
                     Roll3 = roll3,
-                });
+                 
+                }) ;
             }
             string jsonString = JsonSerializer.Serialize(frameData);
             return jsonString;
@@ -372,9 +411,46 @@ namespace BowlingApp
             return scoreList;
         }
 
+        public string scoreJson()
+        {
+            List<FrameData> frameData = new List<FrameData>();
+            int count = 0;
+            foreach (Frame frame in Frames)
+            {
+                count++;
+                string roll1 = "";
+                string roll2 = "";
+                string roll3 = "";
+
+                bool secondSpare = false;
+
+                if (frame.FirstRoll.PinsDowned() != -1)
+                {
+                    roll1 = frame.FirstRoll.PinsDowned().ToString();
+                }
+                if (frame.SecondRoll.PinsDowned() != -1)
+                {
+                    roll2 = frame.SecondRoll.PinsDowned().ToString();
+                }
+                if (frame is FinalFrame finalFrame && finalFrame.ThirdRoll.PinsDowned() != -1)
+                {
+                    roll3 = finalFrame.ThirdRoll.PinsDowned().ToString();
+                    secondSpare = finalFrame.isSecondSpare;
+                }
 
 
 
+                frameData.Add(new FrameData
+                {
+                    Frame = count,
+                    Roll1 = roll1,
+                    Roll2 = roll2,
+                    Roll3 = roll3,
+                });
+            }
+            string jsonString = JsonSerializer.Serialize(frameData);
+            return jsonString;
+        }
     }
 }
 
