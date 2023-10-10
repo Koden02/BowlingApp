@@ -113,38 +113,50 @@
     }
 }
 
+/* styles.css */
+
+/* Add styles for the score sheet */
 .score-sheet {
     display: flex;
     justify-content: center;
     align-items: center;
     margin-top: 20px;
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: wrap;
 }
 
 .frame {
-    display: flex; /* Use flex container */
-    justify-content: space-between; /* Space the rolls horizontally */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     align-items: center;
-    margin: 0 10px;
+    margin: 10px;
     border: 1px solid #000;
-    width: 100px; /* Adjust the width if needed */
-    height: 60px;
-    font-size: 18px;
+    width: 60px;
+    height: 120px;
+    font-size: 14px;
+}
+
+.frame-number {
+    font-size: 12px;
+    margin-bottom: 5px;
 }
 
 .rolls {
-    display: flex; /* Use flex container for rolls */
+    display: flex;
+    width: 100%;
+    justify-content: space-around;
+    padding: 5px 0;
+    border-top: 1px solid #000;
 }
 
 .roll {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    width: 40%;
+    text-align: center;
 }
 
 .score {
     margin-top: 10px;
-    font-size: 24px; /* Larger font size for total score */
+    font-size: 18px;
     font-weight: bold;
 }

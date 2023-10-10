@@ -9,11 +9,7 @@ const BowlingGame = () => {
         { id: 1, frame: 1, roll1: '', roll2: '', roll3: '' },
     ]);
 
-    const [scoreSheetData, setScoreSheetData] = useState([
-        { frame: 1, roll1: 'X', roll2: '-', score: '20' },
-        { frame: 2, roll1: '9', roll2: '/', score: '44' },
-        // Add more frames as needed
-    ]);
+    const [calculateTotalScoreList, setCalculateTotalScoreList] = useState([])
 
     const [totalScore, setTotalScore] = useState(0);
 
@@ -81,6 +77,7 @@ const BowlingGame = () => {
                 // Call the getScoreTable endpoint after getting the number of pins knocked down
                 fetchScoreTable();
                 fetchTotalScore();
+                fetchScoreList();
 
 
             })
@@ -143,10 +140,35 @@ const BowlingGame = () => {
             });
     };
 
+    const fetchScoreList = () => {
+        fetch('https://localhost:7156/api/bowling/getScoreList', {
+            method: 'GET',
+            headers: {
+                accept: 'application/json'
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(scoreListData => {
+                // Handle the response and update the UI with the score list data
+                console.log(scoreListData); // Log the server response
+                setCalculateTotalScoreList(scoreListData);
+            })
+            .catch(error => {
+                // Handle/display errors for getScoreList endpoint
+                console.error('Error:', error);
+            });
+    };
+
     // Fetch the initial score table data when the component is mounted
     useEffect(() => {
         fetchScoreTable();
         fetchTotalScore();
+        fetchScoreList();
     }, []); // Empty dependency array ensures this effect runs once after the initial render
 
 
@@ -162,7 +184,8 @@ const BowlingGame = () => {
             {pinsKnockedDown !== null && pinsKnockedDown !== -1 && <p>Pins Knocked Down: {pinsKnockedDown}</p>}
             {/* Everything else goes here or above */}
             <p></p>
-            <p>Score:</p>
+            <p></p>
+            <h2>Score:</h2>
             {/* HTML table */}
             <table className="custom-table">
                 <thead>
@@ -189,11 +212,15 @@ const BowlingGame = () => {
             <p></p>
             {/* Bowling score sheet */}
             <div className="score-sheet">
-                {scoreSheetData.map((frame, index) => (
-                    <div key={index} className="frame">
-                        <div className="roll">{frame.roll1}</div>
-                        <div className="roll">{frame.roll2}</div>
-                        <div className="score">{frame.score}</div>
+                {tableData.map((frame, index) => (
+                    <div key={frame.id} className="frame">
+                        <div className="frame-number">{frame.frame}</div>
+                        <div className="rolls">
+                            <div className="roll">{frame.roll1}</div>
+                            <div className="roll">{frame.roll2}</div>
+                            {frame.roll3 !== "" && <div className="roll">{frame.roll3}</div> }
+                        </div>
+                        <div className="score">{calculateTotalScoreList[index]}</div>
                     </div>
                 ))}
             </div>
