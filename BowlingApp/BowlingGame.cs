@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json;
+using System.Linq;
 
 namespace BowlingApp
 {
@@ -35,6 +37,12 @@ namespace BowlingApp
                     return PinsKnockedDown;
                 }
                 else { return -1; }
+            }
+
+            public int PinsDownedCount()
+            {
+                // Use this to report the number of pins knocked down for counting, don't use -1
+                return PinsKnockedDown;
             }
 
             public bool WasTaken()
@@ -145,6 +153,9 @@ namespace BowlingApp
 
             public override int RollBall(int rollSkill)
             {
+                if (this.isFinished)
+                    return 0;
+
                 int pinsKnockedDown = 0;
                 if (this.FirstRoll.WasTaken())
                 {
@@ -189,6 +200,15 @@ namespace BowlingApp
                 return pinsKnockedDown;
             }
         }
+        private class FrameData
+        {
+            public int Id { get; set; }
+            public int Frame { get; set; }
+            public string? Roll1 { get; set; }
+            public string? Roll2 { get; set; }
+            public string? Roll3 { get; set; }
+        }
+
         private List<Frame> Frames { get; set; } = new List<Frame>();
 
         public BowlingGame()
@@ -234,6 +254,113 @@ namespace BowlingApp
             return true;
 
         }
+
+        public string scoreJson()
+        {
+            List<FrameData> frameData = new List<FrameData>();
+            int count = 0;
+            foreach (Frame frame in Frames)
+            {
+                count++;
+                string roll1 = "";
+                string roll2 = "";
+                string roll3 = "";
+
+                if (frame.FirstRoll.PinsDowned() != -1)
+                {
+                    roll1 = frame.FirstRoll.PinsDowned().ToString();
+                }
+                if (frame.SecondRoll.PinsDowned() != -1)
+                {
+                    roll2 = frame.SecondRoll.PinsDowned().ToString();
+                }
+                if (frame is FinalFrame finalFrame && finalFrame.ThirdRoll.PinsDowned() != -1)
+                {
+                    roll3 = finalFrame.ThirdRoll.PinsDowned().ToString();
+                }
+
+                frameData.Add(new FrameData
+                {
+                    Id = count,
+                    Frame = count,
+                    Roll1 = roll1,
+                    Roll2 = roll2,
+                    Roll3 = roll3,
+                });
+            }
+            string jsonString = JsonSerializer.Serialize(frameData);
+            return jsonString;
+        }
+
+        public int CalculateTotalScore()
+        {
+            List<int> scoreList = CalculateTotalScoreList();
+            return scoreList.Last();
+        }
+
+        public List<int> CalculateTotalScoreList()
+        {
+            int score = 0;
+            List<int> scoreList = new List<int>();
+
+            for (int frameNumber = 1; frameNumber <= Frames.Count; frameNumber++)
+            {
+                Frame currentFrame = Frames[frameNumber - 1];
+
+                if (currentFrame is FinalFrame finalFrame)
+                {
+                    score += finalFrame.FirstRoll.PinsDownedCount() + finalFrame.SecondRoll.PinsDownedCount() + finalFrame.ThirdRoll.PinsDownedCount();
+                }
+                else if (currentFrame.isStrike)
+                {
+                    score += 10;
+
+                    if (frameNumber < Frames.Count)
+                    {
+                        Frame nextFrame = Frames[frameNumber];
+
+                        if (nextFrame.isStrike)
+                        {
+                            // If the next frame is also a strike, add the next two rolls' scores as bonus points
+                            score += 10;
+
+                            if (frameNumber + 1 < Frames.Count)
+                            {
+                                Frame nextNextFrame = Frames[frameNumber + 1];
+                                score += nextNextFrame.FirstRoll.PinsDownedCount();
+                            }
+                        }
+                        else
+                        {
+                            // If the next frame is not a strike, add the next two rolls' scores as bonus points
+                            score += nextFrame.FirstRoll.PinsDownedCount() + nextFrame.SecondRoll.PinsDownedCount();
+                        }
+                    }
+                }
+                else if (currentFrame.isSpare)
+                {
+                    score += 10;
+
+                    if (frameNumber < Frames.Count)
+                    {
+                        Frame nextFrame = Frames[frameNumber];
+                        score += nextFrame.FirstRoll.PinsDownedCount();
+                    }
+                }
+                else
+                {
+                    // If neither strike nor spare, add the total number of pins knocked down in the frame to the score
+                    score += currentFrame.FirstRoll.PinsDownedCount() + currentFrame.SecondRoll.PinsDownedCount();
+                }
+
+                scoreList.Add(score);
+            }
+
+            return scoreList;
+        }
+
+
+
     }
 }
 

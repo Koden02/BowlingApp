@@ -52,5 +52,23 @@ namespace BowlingApp.Controllers
             return Ok(new { message = "New Game Started."});
         }
 
+        [HttpGet("getScoreTable")]
+        public IActionResult getScoreTable()
+        {
+            return Ok(_bowlingGame.scoreJson().ToLower());
+        }
+
+        [HttpGet("getTotalScore")]
+        public IActionResult getTotalScore()
+        {
+            int totalScore = _bowlingGame.CalculateTotalScore();
+            return Ok( new { totalScore } );
+        }
+
+        [HttpGet("getScoreList")]
+        public IActionResult getScoreList() 
+        {
+            return Ok(_bowlingGame.CalculateTotalScoreList());
+        }
     }
 }
