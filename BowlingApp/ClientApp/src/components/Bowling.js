@@ -257,9 +257,9 @@ const BowlingGame = () => {
             </div>
             <p></p>
             <p></p>
-            {pinsKnockedDown == -1 && <h2>Game Over!</h2>}
+            {pinsKnockedDown === -1 && <h2>Game Over!</h2>}
             {diceRollResult > 0 && <p>Dice Roll Result: {diceRollResult}</p>}
-            {pinsKnockedDown != null && pinsKnockedDown != -1 && <p>Pins Knocked Down: {pinsKnockedDown}</p>}
+            {pinsKnockedDown !== null && pinsKnockedDown !== -1 && <p>Pins Knocked Down: {pinsKnockedDown}</p>}
             {/* Everything else goes here or above */}
             <p></p>
             <p></p>
@@ -296,7 +296,7 @@ const BowlingGame = () => {
                         <div className="rolls">
                             <div className="roll">{frame.roll1}</div>
                             <div className="roll">{frame.roll2}</div>
-                            {frame.roll3 != "" && <div className="roll">{frame.roll3}</div> }
+                            {frame.roll3 !== "" && <div className="roll">{frame.roll3}</div> }
                         </div>
                         <div className="score">{calculateTotalScoreList[index]}</div>
                     </div>
