@@ -151,7 +151,8 @@ const BowlingGame = () => {
             <p></p>
             <button onClick={rollDice}>Roll the ball!</button>
             <p></p>
-            {diceRollResult !== 0 && <p>Dice Roll Result: {diceRollResult}</p>}
+            {diceRollResult === -1 && <h2>Game Over!</h2>}
+            {diceRollResult > 0 && <p>Dice Roll Result: {diceRollResult}</p>}
             {pinsKnockedDown !== null && <p>Pins Knocked Down: {pinsKnockedDown}</p>}
             {/* Everything else goes here or above */}
             <p></p>

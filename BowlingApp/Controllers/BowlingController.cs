@@ -20,6 +20,10 @@ namespace BowlingApp.Controllers
         [HttpPost("calculateScore")]
         public IActionResult CalculateScore([FromBody] JsonElement body)
         {
+            int pinsKnockedDown = -1; // -1 will show that nothing happened.
+            // You should make sure the game is still running so you don't run unneeded
+            if (_bowlingGame.IsGameOver())
+                return Ok(new {pinsKnockedDown} );
             string json = System.Text.Json.JsonSerializer.Serialize(body);
             JObject jo = JObject.Parse(json);
             JToken jToken = jo["rollNumber"];
@@ -33,14 +37,14 @@ namespace BowlingApp.Controllers
             // Calculate the number of pins knocked down based on the random number
             // Implement your game logic here
 
-            int pinsKnockedDown = CalculatePinsKnockedDown(validRoll);
+            pinsKnockedDown = CalculatePinsKnockedDown(validRoll);
 
             return Ok(new { pinsKnockedDown });
         }
 
-        private int CalculatePinsKnockedDown(int randomNumber)
+        private int CalculatePinsKnockedDown(int skillRollNumber)
         {
-            return _bowlingGame.TakeTurn(randomNumber);
+            return _bowlingGame.TakeTurn(skillRollNumber);
         }
 
         [HttpGet("newGame")]
