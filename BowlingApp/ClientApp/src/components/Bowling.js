@@ -6,7 +6,7 @@ const BowlingGame = () => {
     const [pinsKnockedDown, setPinsKnockedDown] = useState(null);
 
     const [tableData, setTableData] = useState([
-        { frame: 1, roll1: '', roll2: '', roll3: ''},
+        { frame: 1, roll1: '', roll2: '', roll3: '' },
     ]);
 
     const [calculateTotalScoreList, setCalculateTotalScoreList] = useState([])
@@ -17,15 +17,18 @@ const BowlingGame = () => {
     const [isOverrideEnabled, setIsOverrideEnabled] = useState(false);
 
     const [styleTableData, setStyleTableData] = useState([
-        { frame:1, roll1: '', roll2: '', roll3: ''
+        {
+            frame: 1, roll1: '', roll2: '', roll3: ''
 
         }
     ]); // These are different and will have the stylized outputs
 
+    const [isGameOver, setIsGameOver] = useState(false);
+
     const handleOverrideChange = (event) => {
         const inputValue = event.target.value;
         // Ensure the input value is between 0 and 10
-        if (inputValue === '' || (parseInt(inputValue) >= 0 && parseInt(inputValue) <= 10)){
+        if (inputValue === '' || (parseInt(inputValue) >= 0 && parseInt(inputValue) <= 10)) {
             setOverrideNumber(inputValue);
         }
     };
@@ -138,7 +141,7 @@ const BowlingGame = () => {
                 fetchTotalScore();
                 fetchScoreList();
                 fetchStyleScoreTable();
-
+                fetchIsGameOver();
 
             })
             .catch(error => {
@@ -171,6 +174,7 @@ const BowlingGame = () => {
                 fetchStyleScoreTable();
                 setDiceRollResult(0);
                 setPinsKnockedDown(null);
+                setIsGameOver(false);
             })
             .catch(error => {
                 // Handle/display errors
@@ -226,12 +230,37 @@ const BowlingGame = () => {
             });
     };
 
+    const fetchIsGameOver = () => {
+        fetch('https://localhost:7156/api/bowling/getIsGameOver', {
+            method: 'GET',
+            headers: {
+                accept: 'application/json'
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(isGameOverData => {
+                console.log(isGameOverData); // Log the server response
+                setIsGameOver(isGameOverData)
+            })
+            .catch(error => {
+                // Handle/display errors for getScoreList endpoint
+                console.error('Error:', error);
+            });
+    };
+
+
     // Fetch the initial score table data when the component is mounted
     useEffect(() => {
         fetchScoreTable();
         fetchTotalScore();
         fetchScoreList();
         fetchStyleScoreTable();
+        fetchIsGameOver();
     }, []); // Empty dependency array ensures this effect runs once after the initial render
 
 
@@ -239,7 +268,9 @@ const BowlingGame = () => {
         <div className="table-container">
             <h1>Bowling App</h1>
             <p><button className="button-56" onClick={startNewGame}>Start New Game</button></p>
-            <p><button className="button-56" onClick={rollDice}>Roll the ball!</button></p>
+            <p><button className="button-56" onClick={rollDice} disabled={isGameOver}>Roll the ball!</button></p>
+            <p></p>
+            <p></p>
             <div className="override-container">
                 <label>
                     Override Number:
@@ -251,14 +282,14 @@ const BowlingGame = () => {
                         placeholder="Enter value (0-10)"
                     />
                 </label>
-                <button onClick={toggleOverride}>
+                <p><button className="button-56" onClick={toggleOverride}>
                     {isOverrideEnabled ? 'Disable Override' : 'Enable Override'}
-                </button>
+                </button></p>
             </div>
             <p></p>
             <p></p>
-            {pinsKnockedDown === -1 && <h2>Game Over!</h2>}
-            {diceRollResult > 0 && <p>Dice Roll Result: {diceRollResult}</p>}
+            {isGameOver && <h2>Game Over!</h2>}
+            {diceRollResult >= 0 && <p>Dice Roll Result: {diceRollResult}</p>}
             {pinsKnockedDown !== null && pinsKnockedDown !== -1 && <p>Pins Knocked Down: {pinsKnockedDown}</p>}
             {/* Everything else goes here or above */}
             <p></p>
@@ -282,7 +313,7 @@ const BowlingGame = () => {
                             <td>{row.roll2}</td>
                             <td>{row.roll3}</td>
                         </tr>
-                    )) }
+                    ))}
                 </tbody>
             </table>
             <p>Total Score: {totalScore}</p>
@@ -296,7 +327,7 @@ const BowlingGame = () => {
                         <div className="rolls">
                             <div className="roll">{frame.roll1}</div>
                             <div className="roll">{frame.roll2}</div>
-                            {frame.roll3 !== "" && <div className="roll">{frame.roll3}</div> }
+                            {frame.roll3 !== "" && <div className="roll">{frame.roll3}</div>}
                         </div>
                         <div className="score">{calculateTotalScoreList[index]}</div>
                     </div>
