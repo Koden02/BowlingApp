@@ -80,5 +80,11 @@ namespace BowlingApp.Controllers
         {
             return Ok(_bowlingGame.CalculateTotalScoreList());
         }
+
+        [HttpGet("getIsGameOver")]
+        public IActionResult getIsGameOver()
+        {
+            return Ok(_bowlingGame.IsGameOver());
+        }
     }
 }
