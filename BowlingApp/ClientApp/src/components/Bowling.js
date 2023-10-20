@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import './styles.css';
 
 const BowlingGame = () => {
@@ -39,25 +40,11 @@ const BowlingGame = () => {
 
 
     const fetchScoreTable = () => {
-        fetch('https://localhost:7156/api/bowling/getScoreTable', {
-            method: 'GET',
-            headers: {
-                accept: 'application/json'
-            }
-        })
+        axios.get('https://localhost:7156/api/bowling/getScoreTable')
             .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(scoreTableData => {
-                // Handle the response and update the UI with the score table data
-                console.log(scoreTableData); // Log the server response
-                // Update your UI or state with scoreTableData
-
-                let array = JSON.parse(scoreTableData);
-
+                console.log(response.data) // Log the server response
+                const scoreTableData = response.data;
+                let array = scoreTableData;
                 if (Array.isArray(array)) {
                     setTableData(array);
                 } else {
@@ -71,25 +58,11 @@ const BowlingGame = () => {
     };
 
     const fetchStyleScoreTable = () => {
-        fetch('https://localhost:7156/api/bowling/getStyleScoreTable', {
-            method: 'GET',
-            headers: {
-                accept: 'application/json'
-            }
-        })
+        axios.get('https://localhost:7156/api/bowling/getStyleScoreTable')
             .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(styleScoreTableData => {
-                // Handle the response and update the UI with the score table data
-                console.log(styleScoreTableData); // Log the server response
-                // Update your UI or state with scoreTableData
-
-                let array = JSON.parse(styleScoreTableData);
-
+                console.log(response.data) // Log the server response
+                const styleScoreTableData = response.data;
+                let array = styleScoreTableData;
                 if (Array.isArray(array)) {
                     setStyleTableData(array);
                 } else {
@@ -113,26 +86,15 @@ const BowlingGame = () => {
         const jsonString = JSON.stringify({ rollNumber: randomNumber });
 
         // Take this random rolled number and send it to the API for it to decide what the result is.
-        fetch('https://localhost:7156/api/bowling/calculateScore', {
-            method: 'POST',
+        axios.post('https://localhost:7156/api/bowling/calculateScore', jsonString, {
             headers: {
                 'Content-Type': 'application/json',
             },
-            mode: 'cors',
-            cache: 'no-cache',
-            credentials: 'same-origin',
-            body: jsonString,
 
         })
             .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
                 // Handle the response and update the UI here with the result
-                const pinsDowned = data.pinsKnockedDown;
+                const pinsDowned = response.data.pinsKnockedDown;
                 setPinsKnockedDown(pinsDowned);
                 // Update the UI
 
@@ -152,22 +114,14 @@ const BowlingGame = () => {
 
     const startNewGame = () => {
         // Send a request to start a new game
-        fetch('https://localhost:7156/api/bowling/newGame', {
-            method: 'GET',
+        axios.get('https://localhost:7156/api/bowling/newGame', {
             headers: {
                 accept: 'application/json'
             }
-            //credentials: 'include', // Use 'include' to send credentials (cookies, etc.) with the request
         })
             .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
                 // Handle the response and update the UI
-                console.log(data.message); // Log the server response
+                console.log(response.data.message); // Log the server response
                 fetchScoreTable();
                 fetchTotalScore();
                 fetchScoreList();
@@ -183,22 +137,11 @@ const BowlingGame = () => {
     };
 
     const fetchTotalScore = () => {
-        fetch('https://localhost:7156/api/bowling/getTotalScore', {
-            method: 'GET',
-            headers: {
-                accept: 'application/json'
-            }
-        })
+        axios.get('https://localhost:7156/api/bowling/getTotalScore')
             .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
                 // Handle the response and update the UI with the total score data
-                console.log(data); // Log the server response
-                setTotalScore(data.totalScore); // Assuming the response has a property called totalScore
+                console.log(response.data); // Log the server response
+                setTotalScore(response.data.totalScore); // Assuming the response has a property called totalScore
             })
             .catch(error => {
                 // Handle/display errors for getTotalScore endpoint
@@ -207,22 +150,11 @@ const BowlingGame = () => {
     };
 
     const fetchScoreList = () => {
-        fetch('https://localhost:7156/api/bowling/getScoreList', {
-            method: 'GET',
-            headers: {
-                accept: 'application/json'
-            }
-        })
+        axios.get('https://localhost:7156/api/bowling/getScoreList')
             .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(scoreListData => {
                 // Handle the response and update the UI with the score list data
-                console.log(scoreListData); // Log the server response
-                setCalculateTotalScoreList(scoreListData);
+                console.log(response.data); // Log the server response
+                setCalculateTotalScoreList(response.data);
             })
             .catch(error => {
                 // Handle/display errors for getScoreList endpoint
@@ -231,21 +163,10 @@ const BowlingGame = () => {
     };
 
     const fetchIsGameOver = () => {
-        fetch('https://localhost:7156/api/bowling/getIsGameOver', {
-            method: 'GET',
-            headers: {
-                accept: 'application/json'
-            }
-        })
+        axios.get('https://localhost:7156/api/bowling/getIsGameOver')
             .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(isGameOverData => {
-                console.log(isGameOverData); // Log the server response
-                setIsGameOver(isGameOverData)
+                console.log(response.data); // Log the server response
+                setIsGameOver(response.data)
             })
             .catch(error => {
                 // Handle/display errors for getScoreList endpoint
