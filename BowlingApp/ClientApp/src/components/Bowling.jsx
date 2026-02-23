@@ -39,7 +39,7 @@ const BowlingGame = () => {
 
 
     const fetchScoreTable = () => {
-        fetch('https://localhost:7156/api/bowling/getScoreTable', {
+        fetch('/api/bowling/getScoreTable', {
             method: 'GET',
             headers: {
                 accept: 'application/json'
@@ -71,7 +71,7 @@ const BowlingGame = () => {
     };
 
     const fetchStyleScoreTable = () => {
-        fetch('https://localhost:7156/api/bowling/getStyleScoreTable', {
+        fetch('/api/bowling/getStyleScoreTable', {
             method: 'GET',
             headers: {
                 accept: 'application/json'
@@ -113,7 +113,7 @@ const BowlingGame = () => {
         const jsonString = JSON.stringify({ rollNumber: randomNumber });
 
         // Take this random rolled number and send it to the API for it to decide what the result is.
-        fetch('https://localhost:7156/api/bowling/calculateScore', {
+        fetch('/api/bowling/calculateScore', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -152,7 +152,7 @@ const BowlingGame = () => {
 
     const startNewGame = () => {
         // Send a request to start a new game
-        fetch('https://localhost:7156/api/bowling/newGame', {
+        fetch('/api/bowling/newGame', {
             method: 'GET',
             headers: {
                 accept: 'application/json'
@@ -183,7 +183,7 @@ const BowlingGame = () => {
     };
 
     const fetchTotalScore = () => {
-        fetch('https://localhost:7156/api/bowling/getTotalScore', {
+        fetch('/api/bowling/getTotalScore', {
             method: 'GET',
             headers: {
                 accept: 'application/json'
@@ -207,7 +207,7 @@ const BowlingGame = () => {
     };
 
     const fetchScoreList = () => {
-        fetch('https://localhost:7156/api/bowling/getScoreList', {
+        fetch('/api/bowling/getScoreList', {
             method: 'GET',
             headers: {
                 accept: 'application/json'
@@ -231,7 +231,7 @@ const BowlingGame = () => {
     };
 
     const fetchIsGameOver = () => {
-        fetch('https://localhost:7156/api/bowling/getIsGameOver', {
+        fetch('/api/bowling/getIsGameOver', {
             method: 'GET',
             headers: {
                 accept: 'application/json'
