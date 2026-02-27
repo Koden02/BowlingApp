@@ -1,0 +1,12 @@
+FROM node:20-alpine
+WORKDIR /web
+
+COPY BowlingApp/ClientApp/package*.json ./
+RUN npm ci
+
+COPY BowlingApp/ClientApp/ ./
+
+EXPOSE 5173
+
+# Bind to 0.0.0.0 so Docker can publish the port
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "5173"]

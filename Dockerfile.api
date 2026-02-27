@@ -1,0 +1,18 @@
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+WORKDIR /src
+
+# restore
+COPY BowlingApp/BowlingApp.csproj BowlingApp/
+RUN dotnet restore BowlingApp/BowlingApp.csproj
+
+# build/publish
+COPY BowlingApp/ BowlingApp/
+RUN dotnet publish BowlingApp/BowlingApp.csproj -c Release -o /app/publish /p:SkipClientBuild=true
+
+# runtime
+FROM mcr.microsoft.com/dotnet/aspnet:6.0
+WORKDIR /app
+COPY --from=build /app/publish ./
+ENV ASPNETCORE_URLS=http://+:8080
+EXPOSE 8080
+ENTRYPOINT ["dotnet", "BowlingApp.dll"]
