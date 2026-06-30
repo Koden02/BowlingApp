@@ -1,9 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using BowlingApp;
-using Microsoft.AspNetCore.Cors;
-using System.Text.Json;
-using System.Text.Json.Nodes;
-using Newtonsoft.Json.Linq;
 
 namespace BowlingApp.Controllers
 {
@@ -12,32 +8,32 @@ namespace BowlingApp.Controllers
     public class BowlingController : ControllerBase
     {
         private static BowlingGame _bowlingGame = new BowlingGame();
+        private static readonly object _gameLock = new object();
 
         public BowlingController()
         {
         }
 
         [HttpPost("calculateScore")]
-        public IActionResult CalculateScore([FromBody] JsonElement body)
+        public IActionResult CalculateScore([FromBody] RollRequest? request)
         {
             int pinsKnockedDown = -1; // -1 will show that nothing happened.
-            // You should make sure the game is still running so you don't run unneeded
-            if (_bowlingGame.IsGameOver())
-                return Ok(new {pinsKnockedDown} );
-            string json = System.Text.Json.JsonSerializer.Serialize(body);
-            JObject jo = JObject.Parse(json);
-            JToken jToken = jo["rollNumber"];
-            int rollNumber = (int)jToken;
-            // Sanity check the values
-            int validRoll;
-            if (rollNumber < 0) { validRoll = 0; }
-            else if (rollNumber > 10) { validRoll = 10; }
-            else validRoll = rollNumber;
 
-            // Calculate the number of pins knocked down based on the random number
-            // Implement your game logic here
+            if (request?.RollNumber is null)
+            {
+                return BadRequest(new { message = "rollNumber is required." });
+            }
 
-            pinsKnockedDown = CalculatePinsKnockedDown(validRoll);
+            int validRoll = Math.Clamp(request.RollNumber.Value, 0, 10);
+
+            lock (_gameLock)
+            {
+                // You should make sure the game is still running so you don't run unneeded
+                if (_bowlingGame.IsGameOver())
+                    return Ok(new { pinsKnockedDown });
+
+                pinsKnockedDown = CalculatePinsKnockedDown(validRoll);
+            }
 
             return Ok(new { pinsKnockedDown });
         }
@@ -47,44 +43,69 @@ namespace BowlingApp.Controllers
             return _bowlingGame.TakeTurn(skillRollNumber);
         }
 
-        [HttpGet("newGame")]
+        [HttpPost("newGame")]
         public IActionResult NewGame()
         {
-            // Reset the game to start from scratch.
-            _bowlingGame.NewGame();
+            lock (_gameLock)
+            {
+                // Reset the game to start from scratch.
+                _bowlingGame.NewGame();
+            }
 
-            return Ok(new { message = "New Game Started."});
+            return Ok(new { message = "New Game Started." });
         }
 
         [HttpGet("getScoreTable")]
         public IActionResult getScoreTable()
         {
-            return Ok(_bowlingGame.scoreJson().ToLower());
+            lock (_gameLock)
+            {
+                return Ok(_bowlingGame.scoreJson().ToLower());
+            }
         }
 
         [HttpGet("getStyleScoreTable")]
         public IActionResult getStyleScoreTable()
         {
-            return Ok(_bowlingGame.styleScoreJson().ToLower());
+            lock (_gameLock)
+            {
+                return Ok(_bowlingGame.styleScoreJson().ToLower());
+            }
         }
 
         [HttpGet("getTotalScore")]
         public IActionResult getTotalScore()
         {
-            int totalScore = _bowlingGame.CalculateTotalScore();
-            return Ok( new { totalScore } );
+            int totalScore;
+            lock (_gameLock)
+            {
+                totalScore = _bowlingGame.CalculateTotalScore();
+            }
+
+            return Ok(new { totalScore });
         }
 
         [HttpGet("getScoreList")]
-        public IActionResult getScoreList() 
+        public IActionResult getScoreList()
         {
-            return Ok(_bowlingGame.CalculateTotalScoreList());
+            lock (_gameLock)
+            {
+                return Ok(_bowlingGame.CalculateTotalScoreList());
+            }
         }
 
         [HttpGet("getIsGameOver")]
         public IActionResult getIsGameOver()
         {
-            return Ok(_bowlingGame.IsGameOver());
+            lock (_gameLock)
+            {
+                return Ok(_bowlingGame.IsGameOver());
+            }
+        }
+
+        public class RollRequest
+        {
+            public int? RollNumber { get; set; }
         }
     }
 }

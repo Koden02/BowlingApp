@@ -7,10 +7,8 @@ builder.Services.AddCors(options =>
         policy => {
             policy.WithOrigins("https://localhost:44408",
                 "https://localhost:7156")
-            .AllowAnyHeader()
-            //.WithHeaders(HeaderNames.ContentType, "application/json")
-            .AllowAnyMethod()
-            .AllowCredentials();
+            .WithHeaders(HeaderNames.Accept, HeaderNames.ContentType)
+            .WithMethods("GET", "POST");
             });
 });
 
@@ -31,13 +29,13 @@ app.UseStaticFiles();
 app.UseRouting();
 
 
+app.UseCors();
+app.UseAuthorization();
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller}/{action=Index}/{id?}");
 
 app.MapFallbackToFile("index.html"); ;
-
-app.UseCors();
-app.UseAuthorization();
 
 app.Run();

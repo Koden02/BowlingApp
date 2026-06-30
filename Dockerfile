@@ -12,18 +12,18 @@ RUN npm run build
 
 
 # ---- build backend ----
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS api-build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS api-build
 WORKDIR /src
 
 COPY BowlingApp/*.csproj ./BowlingApp/
 RUN dotnet restore ./BowlingApp/BowlingApp.csproj
 
 COPY BowlingApp/ ./BowlingApp/
-RUN dotnet publish ./BowlingApp/BowlingApp.csproj -c Release -o /app/publish
+RUN dotnet publish ./BowlingApp/BowlingApp.csproj -c Release -o /app/publish /p:SkipClientBuild=true
 
 
 # ---- runtime (single container) ----
-FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 WORKDIR /app
 
 # ASP.NET app

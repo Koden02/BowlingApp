@@ -153,7 +153,7 @@ const BowlingGame = () => {
     const startNewGame = () => {
         // Send a request to start a new game
         fetch('/api/bowling/newGame', {
-            method: 'GET',
+            method: 'POST',
             headers: {
                 accept: 'application/json'
             }
